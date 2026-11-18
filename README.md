@@ -48,7 +48,7 @@ node tests/test.js      # 11 unit tests (validation, expiry boundaries, sales, i
 node tests/smoke.mjs    # 27 headless-Chrome checks driving the real UI
 ```
 
-Verified 2026-11-18 (run #376, 17:00 slot): 11/11 unit tests pass, 27/27 smoke checks pass, 0 console/page errors, 0 non-file network requests. Hand-verified in the smoke run: seeded dashboard (7 medicines, 348 units, ৳8,386 stock value, 1 expired, 2 expiring, 0 low), search "napa" → 1 row, adding a medicine → 8 rows, selling 2 × Napa → stock 120 → 118 and today's sales ৳4, oversell of 9,999 rejected, EN ↔ বাংলা toggle, 390px with no horizontal overflow.
+Verified 2026-11-18 (run #377, 17:00 slot): 11/11 unit tests pass, 27/27 smoke checks pass, 0 console/page errors, 0 non-file network requests. Hand-verified in the smoke run: seeded dashboard (7 medicines, 348 units, ৳8,386 stock value, 1 expired, 2 expiring, 0 low), search "napa" → 1 row, adding a medicine → 8 rows, selling 2 × Napa → stock 120 → 118 and today's sales ৳4, oversell of 9,999 rejected, EN ↔ বাংলা toggle, 390px with no horizontal overflow.
 
 ## Deployment
 
@@ -63,4 +63,4 @@ Static site — publish the repo root on GitHub Pages (or any static host). Live
 
 ## Status
 
-Complete MVP — factory run #376 (2026-11-18, 17:00 slot). Published and verified.
+Complete MVP — factory run #377 (2026-11-18, 17:00 slot). Published and verified.
