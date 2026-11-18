@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pharmacy BD — Medicine Stock &amp; Expiry Tracker</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <span class="cross" aria-hidden="true">✚</span>
+    <div>
+      <h1 id="appTitle">Pharmacy BD</h1>
+      <p id="appSub">Medicine stock &amp; expiry tracker for small pharmacies</p>
+    </div>
+  </div>
+  <button id="langBtn" class="lang-btn" type="button">বাংলা</button>
+</header>
+
+<nav class="tabs" role="tablist" aria-label="Sections">
+  <button class="tab active" data-tab="dashboard" role="tab" type="button">Dashboard</button>
+  <button class="tab" data-tab="stock" role="tab" type="button">Stock</button>
+  <button class="tab" data-tab="sell" role="tab" type="button">Sell</button>
+  <button class="tab" data-tab="sales" role="tab" type="button">Sales</button>
+  <button class="tab" data-tab="data" role="tab" type="button">Data</button>
+</nav>
+
+<main>
+  <!-- DASHBOARD -->
+  <section id="tab-dashboard" class="panel active">
+    <div class="cards">
+      <div class="card"><span class="card-label" data-i18n="totalMeds">Medicines</span><strong id="statMeds">0</strong></div>
+      <div class="card"><span class="card-label" data-i18n="totalUnits">Units in stock</span><strong id="statUnits">0</strong></div>
+      <div class="card"><span class="card-label" data-i18n="stockValue">Stock value</span><strong id="statValue">৳0</strong></div>
+      <div class="card warn"><span class="card-label" data-i18n="lowStock">Low stock</span><strong id="statLow">0</strong></div>
+      <div class="card warn"><span class="card-label" data-i18n="expiringSoon">Expiring ≤ 30 days</span><strong id="statExpiring">0</strong></div>
+      <div class="card danger"><span class="card-label" data-i18n="expired">Expired</span><strong id="statExpired">0</strong></div>
+      <div class="card ok"><span class="card-label" data-i18n="todaysSales">Today's sales</span><strong id="statToday">৳0</strong></div>
+      <div class="card ok"><span class="card-label" data-i18n="thisMonth">This month</span><strong id="statMonth">৳0</strong></div>
+    </div>
+    <h2 data-i18n="alertsTitle">Needs attention</h2>
+    <p id="noAlerts" class="muted" data-i18n="noAlerts">All clear — no expired, expiring or low-stock items.</p>
+    <ul id="alertList" class="alerts"></ul>
+  </section>
+
+  <!-- STOCK -->
+  <section id="tab-stock" class="panel">
+    <div class="toolbar">
+      <input id="searchInput" type="search" placeholder="Search name, generic or batch…" aria-label="Search stock">
+      <select id="catFilter" aria-label="Filter by category"></select>
+      <label class="chk"><input id="alertsOnly" type="checkbox"> <span data-i18n="filterAlerts">Alerts only</span></label>
+      <button id="addBtn" class="btn primary" type="button">+ Add medicine</button>
+    </div>
+
+    <form id="medForm" class="form-card" hidden>
+      <h2 id="formTitle">Add medicine</h2>
+      <input type="hidden" id="fId">
+      <div class="grid2">
+        <label><span data-i18n="fName">Medicine name</span><input id="fName" maxlength="60" required><small class="err" id="eName"></small></label>
+        <label><span data-i18n="fGeneric">Generic name</span><input id="fGeneric" maxlength="60" required><small class="err" id="eGeneric"></small></label>
+        <label><span data-i18n="fCategory">Category</span><select id="fCategory"></select></label>
+        <label><span data-i18n="fBatch">Batch no.</span><input id="fBatch" maxlength="30" required><small class="err" id="eBatch"></small></label>
+        <label><span data-i18n="fExpiry">Expiry date</span><input id="fExpiry" type="date" required><small class="err" id="eExpiry"></small></label>
+        <label><span data-i18n="fQty">Quantity</span><input id="fQty" type="number" min="0" step="1" inputmode="numeric" required><small class="err" id="eQty"></small></label>
+        <label><span data-i18n="fPrice">Unit price (৳)</span><input id="fPrice" type="number" min="0" step="0.01" inputmode="decimal" required><small class="err" id="ePrice"></small></label>
+        <label><span data-i18n="fLowAt">Low-stock alert at</span><input id="fLowAt" type="number" min="0" step="1" inputmode="numeric" value="10" required><small class="err" id="eLowAt"></small></label>
+      </div>
+      <div class="form-actions">
+        <button class="btn primary" type="submit" data-i18n="save">Save</button>
+        <button id="formCancel" class="btn" type="button" data-i18n="cancel">Cancel</button>
+      </div>
+    </form>
+
+    <p id="noStock" class="muted" hidden>No medicines yet — add your first medicine.</p>
+    <div class="table-wrap">
+      <table id="stockTable">
+        <thead><tr>
+          <th data-i18n="colMed">Medicine</th><th data-i18n="colBatch">Batch</th><th data-i18n="colExpiry">Expiry</th>
+          <th data-i18n="colQty">Qty</th><th data-i18n="colPrice">Price</th><th data-i18n="colValue">Value</th>
+          <th data-i18n="colStatus">Status</th><th></th>
+        </tr></thead>
+        <tbody id="stockBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- SELL -->
+  <section id="tab-sell" class="panel">
+    <form id="sellForm" class="form-card">
+      <h2 data-i18n="sellTitle">Record a sale</h2>
+      <div class="grid2">
+        <label><span data-i18n="sellMed">Medicine</span><select id="sMed"></select></label>
+        <label><span data-i18n="sellQty">Quantity</span><input id="sQty" type="number" min="1" step="1" inputmode="numeric" value="1" required></label>
+      </div>
+      <p class="total-line"><span data-i18n="sellTotal">Total</span>: <strong id="sTotal">৳0</strong> <span id="sStock" class="muted"></span></p>
+      <p class="err" id="sellErr"></p>
+      <div class="form-actions">
+        <button class="btn primary" type="submit" data-i18n="sellBtn">Record sale</button>
+      </div>
+      <p id="sellDone" class="ok-msg" hidden>Sale recorded.</p>
+    </form>
+  </section>
+
+  <!-- SALES -->
+  <section id="tab-sales" class="panel">
+    <h2 data-i18n="salesTitle">Sales log</h2>
+    <div class="toolbar">
+      <label><span data-i18n="salesDate">Date</span> <input id="salesDate" type="date"></label>
+      <button id="salesClear" class="btn" type="button">All dates</button>
+      <span class="muted" id="salesSummary"></span>
+    </div>
+    <p class="muted" data-i18n="restoreNote">Deleting a sale returns its quantity to stock.</p>
+    <p id="noSales" class="muted" hidden>No sales yet.</p>
+    <ul id="salesList" class="sales-list"></ul>
+  </section>
+
+  <!-- DATA -->
+  <section id="tab-data" class="panel">
+    <h2>Data</h2>
+    <p class="muted" data-i18n="exportNote">Backup includes medicines and sales.</p>
+    <div class="form-actions">
+      <button id="exportBtn" class="btn primary" type="button">Export data (JSON)</button>
+      <button id="importBtn" class="btn" type="button">Import data (JSON)</button>
+      <input id="importFile" type="file" accept="application/json,.json" hidden>
+    </div>
+    <p id="importMsg" class="ok-msg" hidden></p>
+    <p id="importErr" class="err" hidden></p>
+    <hr>
+    <button id="eraseBtn" class="btn danger" type="button">Erase all data</button>
+    <p class="muted" data-i18n="eraseConfirm">Type DELETE to erase everything.</p>
+    <hr>
+    <p class="muted" data-i18n="sampleNote">Ships with 7 editable example medicines — example prices, not market prices. Replace them with your real stock.</p>
+    <p class="muted small" data-i18n="disclaimer">Study/demo aid for stock-keeping. Always check the printed expiry date on the pack before selling; this app does not verify medicine authenticity or safety.</p>
+  </section>
+</main>
+
+<footer class="foot">
+  <span>Pharmacy BD — offline • data stays in your browser (localStorage) • no network requests</span>
+</footer>
+
+<script src="js/data.js"></script>
+<script src="js/logic.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
